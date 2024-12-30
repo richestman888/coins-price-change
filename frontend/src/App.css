@@ -1,0 +1,209 @@
+.Topbanner {
+  text-align: center;
+}
+
+.App-logo {
+  height: 10vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.App-header {
+  z-index: 0;
+  /* position: fixed; */
+  top: 0px;
+  left: 0px;
+  background-color: #282c34;
+  min-height: 10vh;
+  min-width: 84vw;
+  float: left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  overflow: hidden;
+}
+
+.Topbanner-time {
+  z-index: 0;
+  /* position: fixed; */
+  top: 0px;
+  left: 85vw;
+  background-color: #0b2f77;
+  min-height: 5vh;
+  min-width: 15vw;
+  font-size: calc(11px + 1vmin);
+  color: rgb(252, 231, 9);
+  float: right;
+}
+
+.Connection-error {
+  color: rgb(255, 0, 0);
+}
+
+.VPN-off {
+  color: rgb(255, 0, 0);
+}
+
+.Topbanner-connection {
+  top: 100px;
+  /* top: 5vh; */
+  left: 85vw;
+  min-height: 5vh;
+  min-width: 15vw;
+  background-color: #480b77;
+  float: right;
+}
+
+.Table-chart-switch-selected {
+  width: 10vw;
+  padding: 8px;
+  background: #3497ee;
+  border: none;
+  outline: none;
+  border-radius: 15px;
+  box-shadow: 0 0 50px #3497ee;
+  font-size: 14px;
+  color: white;
+  letter-spacing: 0px;
+}
+
+.Table-chart-switch-unselected {
+  padding: 6px;
+  width: 10vw;
+  border-radius: 15px;
+  border: none;
+}
+
+.Button-coin-unselected {
+  padding: 6px 16px;
+  border-radius: 15px;
+  border: none;
+}
+
+.Button-coin-selected {
+  padding: 6px 16px;
+  background: #7d2ae8;
+  border: none;
+  outline: none;
+  border-radius: 15px;
+  box-shadow: 0 0 40px #7d2ae8;
+  font-size: 14px;
+  color: white;
+  letter-spacing: 0px;
+}
+
+.Main-view {
+  top: 25vh;
+  left: 20vw;  /* must be same as Coins-banner */
+  float: right;
+}
+
+.Coins-banner {
+  top: 35vh;
+  left: 20vw;
+  background-color: #2b60c9;
+  min-height: 2.5vh;
+  min-width: 84vw;
+  float: right;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Table-chart-switch {
+  top: 25vh;
+  left: 20vw;
+  background-color: #2b60c9;
+  min-height: 2.5vh;
+  min-width: 84vw;
+  float: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Control-panel {
+  background-color: #052b76;
+  min-height: 85vh;
+  min-width: 15vw;
+  float: left;
+}
+
+.Date-selection-banner {
+  margin-top: 25vh;
+  background-color: aqua;
+  min-width: 15vw;
+  min-height: 15vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+  color: white;
+}
+
+.Statistics {
+  justify-content: center; 
+  align-items: center;
+}
+
+#Coins {
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+}
+
+#Coins th {
+  border: 1px solid #ddd;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 0px;
+  padding-right: 0px;
+  text-align: center;
+  background-color: #439ef3;
+  color: white;
+}
+
+#Coins td {
+  padding: 8px;
+  text-align: center;
+}
+
+#Coins tr:hover {background-color: #ddd;}
+
+.IndividualCoinTable {
+  justify-content: center; 
+  align-items: center;
+  background-color: #439ef3;
+  min-height: 5vh;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 300px;
+}
+
+.IndividualCoinTableView {
+  border-radius: 15px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border: none;
+  outline: none;
+}
