@@ -1,6 +1,6 @@
 import React from "react";
 import MainView from "./MainView";
-import ControlPanel from "./ControlPanel.jsx";
+import ControlPanel from "./ControlPanel";
 
 const Dashboard = () => {
   return (

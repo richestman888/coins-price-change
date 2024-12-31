@@ -3,53 +3,62 @@ import CoinsBanner from "./CoinsBanner";
 import Chart from "./Chart";
 import { AppContext } from "./AppContext";
 import BinanceDataTable from "./BinanceDataTable";
+import DetailedStats from "./DetailedStats";
 // import MainTable from "./MainTable";
 // import DataFromDB from "./DataFromDB";
 
 const MainView = () => {
   const [tab, setTab] = useState(1);
   const [selectedCoin, setSelectedCoin] = useState("All Coins");
-
-  const handleTabChange = (e) => {
-    setTab(e);
-  };
-
+  const [cryptoData, setCryptoData] = useState([]);
+  
   return (
     <>
-      <div className="Table-chart-switch">
+      <div className="View-type-switch">
         <button
           className={
             tab === 1
-              ? "Table-chart-switch-selected"
-              : "Table-chart-switch-unselected"
+              ? "View-type-switch-selected"
+              : "View-type-switch-unselected"
           }
-          onClick={() => handleTabChange(1)}
+          onClick={() => setTab(1)}
+        >
+          Detailed Statistics
+        </button>
+        <button
+          className={
+            tab === 2
+              ? "View-type-switch-selected"
+              : "View-type-switch-unselected"
+          }
+          onClick={() => setTab(2)}
         >
           Price Change Percentage Table
         </button>
         <button
           className={
-            tab === 2
-              ? "Table-chart-switch-selected"
-              : "Table-chart-switch-unselected"
+            tab === 3
+              ? "View-type-switch-selected"
+              : "View-type-switch-unselected"
           }
-          onClick={() => handleTabChange(2)}
+          onClick={() => setTab(3)}
         >
           Chart
         </button>
       </div>
       <AppContext.Provider value={{ selectedCoin, setSelectedCoin }}>
-        <div className="Coins-banner">
-          <CoinsBanner />
-        </div>
+        <CoinsBanner />
       </AppContext.Provider>
       <div className="Statistics">
         {tab === 1 ? (
-          <BinanceDataTable coin={selectedCoin} />
+          <DetailedStats coin={selectedCoin}/>
+        ) : tab === 2 ? (
+            <BinanceDataTable coin={selectedCoin} />
         ) : (
           <Chart coin={selectedCoin} />
         )}
       </div>
+
       {/* <div className="Statistics">{ tab === 1 ? <DataFromDB coin={selectedCoin} /> : <Chart coin={selectedCoin} /> }</div> */}
       {/* <div className="Statistics">{ tab === 1 ? <MainTable coin={selectedCoin} /> : <Chart coin={selectedCoin} /> }</div> */}
     </>

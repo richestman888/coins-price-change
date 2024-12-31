@@ -26,9 +26,7 @@ const DataFetcher3 = () => {
         const data = await response.json();
         // Filter for some popular cryptocurrencies
         const filteredData = data.filter((item) =>
-          ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "DOGEUSDT"].includes(
-            item.symbol
-          )
+          ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "DOGEUSDT"].includes(item.symbol)
         );
         setCryptoData(filteredData);
       } catch (e) {
@@ -38,7 +36,7 @@ const DataFetcher3 = () => {
 
     fetchData();
     // Set up an interval to fetch data every 60 seconds
-    const interval = setInterval(fetchData, 60000);
+    const interval = setInterval(fetchData, 1000);
 
     // Clear the interval when the component unmounts
     return () => clearInterval(interval);
@@ -54,7 +52,7 @@ const DataFetcher3 = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Symbol</TableCell>
+              <TableCell>SymboL</TableCell>
               <TableCell align="center">time</TableCell>
             </TableRow>
           </TableHead>

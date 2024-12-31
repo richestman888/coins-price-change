@@ -1,14 +1,14 @@
-const express = require('express')
-const mysql = require('mysql')
-const cors = require('cors')
+import express from 'express'
+import cors from 'cors'
+import authRouter from './routes/auth.js'
+import connectToMongoDB from './db/db.js'
 
 const app = express()
 app.use(cors())
+app.use(express.json())
+app.use('/api/auth', authRouter)
 
-app.get('/', (re, res) => {
-    return res.json("From backend side")
-})
-
-app.listen(3306, ()=> {
-    console.log("listening ...")
+app.listen(5050, ()=>{
+    connectToMongoDB()
+    console.log("Server is running on port 5050")
 })

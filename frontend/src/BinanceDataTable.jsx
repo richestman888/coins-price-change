@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import AllCoinsTable from "./AllCoinsTable";
 import IndividualCoinTable from "./IndividualCoinTable";
 import { Typography } from "@mui/material";
 // import PageRefreshRate from './PageRefreshRate';
-import { AppContext2 } from "./AppContext";
+// import { AppContext2 } from "./AppContext";
 
 const BinanceDataTable = (props) => {
   // const [refreshRate, setRefreshRate] = useState('10 secs');

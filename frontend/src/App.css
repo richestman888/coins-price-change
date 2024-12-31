@@ -3,7 +3,7 @@
 }
 
 .App-logo {
-  height: 10vmin;
+  height: 5vmin;
   pointer-events: none;
 }
 
@@ -28,14 +28,14 @@
   top: 0px;
   left: 0px;
   background-color: #282c34;
-  min-height: 10vh;
+  min-height: 5vh;
   min-width: 84vw;
   float: left;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(5px + 1vmin);
   color: white;
   overflow: hidden;
 }
@@ -46,9 +46,9 @@
   top: 0px;
   left: 85vw;
   background-color: #0b2f77;
-  min-height: 5vh;
+  min-height: 1vh;
   min-width: 15vw;
-  font-size: calc(11px + 1vmin);
+  font-size: calc(5px + 1vmin);
   color: rgb(252, 231, 9);
   float: right;
 }
@@ -71,7 +71,19 @@
   float: right;
 }
 
-.Table-chart-switch-selected {
+.View-type-switch {
+  top: 25vh;
+  left: 20vw;
+  background-color: #2b60c9;
+  min-height: 2.5vh;
+  min-width: 84vw;
+  float: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.View-type-switch-selected {
   width: 10vw;
   padding: 8px;
   background: #3497ee;
@@ -84,21 +96,35 @@
   letter-spacing: 0px;
 }
 
-.Table-chart-switch-unselected {
+.View-type-switch-unselected {
   padding: 6px;
   width: 10vw;
   border-radius: 15px;
   border: none;
 }
 
+.View-type-switch-selected:hover {
+  cursor: pointer;
+  background-color:#002ead;
+  transition: 0.0s;
+}
+
+.View-type-switch-unselected:hover {
+  cursor: pointer;
+  background-color:#002ead;
+  transition: 0.1s;
+  color: yellow
+}
+
+
 .Button-coin-unselected {
-  padding: 6px 16px;
+  padding: 6px 10px;
   border-radius: 15px;
   border: none;
 }
 
 .Button-coin-selected {
-  padding: 6px 16px;
+  padding: 6px 10px;
   background: #7d2ae8;
   border: none;
   outline: none;
@@ -107,6 +133,30 @@
   font-size: 14px;
   color: white;
   letter-spacing: 0px;
+}
+
+.Button-coin-unselected:hover {
+  cursor: pointer;
+  background-color:#340068;
+  transition: 0.0s;
+  color: yellow
+}
+
+.Button-coin-unselected:active {
+  background-color: #130272;
+  box-shadow: 0 0 40px #130272;
+}
+
+.Button-coin-selected:hover {
+  cursor: pointer;
+  background-color:#002ead;
+  transition: 0.0s;
+  color: yellow
+}
+
+.Button-coin-selected:active {
+  background-color: #002ead;
+  box-shadow: 0 0 40px #002ead;
 }
 
 .Main-view {
@@ -127,23 +177,26 @@
   align-items: center;
 }
 
-.Table-chart-switch {
-  top: 25vh;
-  left: 20vw;
-  background-color: #2b60c9;
-  min-height: 2.5vh;
-  min-width: 84vw;
-  float: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .Control-panel {
   background-color: #052b76;
   min-height: 85vh;
   min-width: 15vw;
   float: left;
+}
+
+.Backup-project-reminder {
+  margin-top: 0vh;
+  background-color: #28ace0;
+  min-width: 15vw;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+  color: rgb(228, 13, 13);
+  font-size: x-large;
+  font-weight: bold;
+  font-family: sans-serif;
 }
 
 .Date-selection-banner {
@@ -206,4 +259,74 @@
   padding-right: 20px;
   border: none;
   outline: none;
+}
+
+.sign-up-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.sign-up-form {
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.button {
+  width: 100%;
+  padding: 8px;
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.today-button {
+  width: 5vw;
+  padding: 8px;
+  background: #3497ee;
+  border: none;
+  outline: none;
+  border-radius: 15px;
+  box-shadow: 0 0 50px #3497ee;
+  font-size: 14px;
+  color: white;
+  letter-spacing: 0px;
+}
+
+.today-button:hover {
+  cursor: pointer;
+  background-color:#012075;
+  transition: 0.0s;
+  color: yellow
+}
+
+.today-button:active {
+  background-color: #7d2ae8;
+  box-shadow: 0 0 40px #7d2ae8;
+  font-size: 14px;
+  color: white;
+  letter-spacing: 0px;
 }

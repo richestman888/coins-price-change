@@ -1,12 +1,12 @@
 import React from "react";
-import Calendar from "./Calendar.jsx";
+import Calendar from "./Calendar";
+import BackupReminder from "./BackupReminder";
 
 const ControlPanel = () => {
   return (
     <>
-      <div className="Date-selection-banner">
+        <BackupReminder />      
         <Calendar />
-      </div>
     </>
   );
 };
