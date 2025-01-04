@@ -1,5 +1,5 @@
 {
-  "name": "coins-price-change-github",
+  "name": "coins-price-change",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -24,7 +24,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "check-server": "node check-server.js",
+    "start-react": "react-scripts start",
+    "start": "npm run check-server && npm run start-react",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
