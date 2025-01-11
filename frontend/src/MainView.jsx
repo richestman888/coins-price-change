@@ -10,15 +10,16 @@ import { Typography } from "@mui/material";
 // import PageRefreshRate from './PageRefreshRate';
 // import { AppContext2 } from "./AppContext";
 
-
 const MainView = () => {
   const [tab, setTab] = useState(1);
   const [selectedCoin, setSelectedCoin] = useState("All Coins");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cryptoData, setCryptoData] = useState([]);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
   const [isActive, setIsActive] = useState(true);
+  const [BTCUSDTDataObj, setBTCUSDTDataObj] = useState([])
   // const [refreshRate, setRefreshRate] = useState('10 secs');
   // const [refreshRateCountdown, setRefreshRateCountdown] = useState(10);
 
@@ -29,46 +30,79 @@ const MainView = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "https://api.binance.com/api/v3/ticker/24hr"
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const response1 = await fetch("https://api.binance.com/api/v3/ticker/24hr");
+        if (!response1.ok) {
+          throw new Error(`HTTP error! status: ${response1.status}`);
         }
-        const data = await response.json();
+        const data = await response1.json();
         // Filter for some popular cryptocurrencies
-        const filteredData = data.filter((item) => [
-                                                    "ADAUSDT",
-                                                    "ATOMUSDT",
-                                                    "BCHUSDT",
-                                                    "BNBUSDT",
-                                                    "BTCUSDT",
-                                                    "CHZUSDT",
-                                                    "COMPUSDT",
-                                                    "CRVUSDT",
-                                                    "DOGEUSDT",
-                                                    "DOTUSDT",
-                                                    "EOSUSDT",
-                                                    "ETCUSDT",
-                                                    "ETHUSDT",
-                                                    "LINKUSDT",
-                                                    "LTCUSDT",
-                                                    "SANDUSDT",
-                                                    "SOLUSDT",
-                                                    "SUSHIUSDT",
-                                                    "TRXUSDT",
-                                                    "XRPUSDT",
-                                                  ].includes(item.symbol)
-                                                );
+        const filteredData = data.filter((item) =>
+          [
+            "ADAUSDT",
+            "ATOMUSDT",
+            "BCHUSDT",
+            "BNBUSDT",
+            "BTCUSDT",
+            "CHZUSDT",
+            "COMPUSDT",
+            "CRVUSDT",
+            "DOGEUSDT",
+            "DOTUSDT",
+            "EOSUSDT",
+            "ETCUSDT",
+            "ETHUSDT",
+            "LINKUSDT",
+            "LTCUSDT",
+            "SANDUSDT",
+            "SOLUSDT",
+            "SUSHIUSDT",
+            "TRXUSDT",
+            "XRPUSDT",
+          ].includes(item.symbol)
+        );
         setData(filteredData);
         setLoading(false);
-      } catch (e) {
-        setError(e.message);
+
+        const BTCUSDTData = data.map((item) => ({ symbol: item.symbol,
+                                                  priceChangePercent: parseFloat(item.priceChangePercent)}))                                                
+                                .filter((item) => item.symbol === "BTCUSDT");        
+        console.log(BTCUSDTData)
+
+        const BTCUSDTDataArr = BTCUSDTData.map((item) => Object.entries(item))
+        console.log(BTCUSDTDataArr)
+
+        const BTCUSDTDataObj = Object.fromEntries(BTCUSDTDataArr)
+        console.log(BTCUSDTDataObj)
+
+        const filteredData3 = filteredData.map((item) => item.symbol + item.priceChangePercent)
+
+        // Send the filtered data to the backend 
+        const response2 = await fetch(
+          "http://localhost:6060/api/saveCryptoData",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              timestamp: new Date(),
+              coins: BTCUSDTDataObj,
+            }),
+          }
+        );
+                          if (response2.ok) {
+                            setMessage("Data saved to MongoDB successfully");
+                            setError("");
+                          } else {
+                            setMessage("");
+                            setError("Error saving data to MongoDB");
+                          }
+      } catch (error) {
+        setError("Error returned from system: " + error.message);
+        setLoading(false)
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 1000); // Set up an interval to fetch data
+    const interval = setInterval(fetchData, 60000); // Set up an interval to fetch data
 
     // const resetCountdown = () => {
     //   setRefreshRateCountdown(10)
@@ -88,70 +122,50 @@ const MainView = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (error) {
-    return (
-      <>
-        <Typography color="error">
-          Error: {error} Please check if you are connected to ProtonVPN/TurboVPN
-          via browser extension.
-        </Typography>
-        <button onClick={window.location.reload()}>Reload page</button>
-        {/* <PageRefreshRate /> */}
-      </>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <>
+  //       <Typography color="error">
+  //         Error: {error} Please check if you are connected to ProtonVPN/TurboVPN via browser extension.
+  //       </Typography>
+  //       <button onClick={window.location.reload()}>Reload page</button>
+  //     </>
+  //   );
+  // }
 
-  return (
-    <>
-      <div className="View-type-switch">
-        <button
-          className={
-            tab === 1
-              ? "View-type-switch-selected"
-              : "View-type-switch-unselected"
-          }
-          onClick={() => setTab(1)}
-        >
-          Detailed Statistics
-        </button>
-        <button
-          className={
-            tab === 2
-              ? "View-type-switch-selected"
-              : "View-type-switch-unselected"
-          }
-          onClick={() => setTab(2)}
-        >
-          Price Change Percentage Table
-        </button>
-        <button
-          className={
-            tab === 3
-              ? "View-type-switch-selected"
-              : "View-type-switch-unselected"
-          }
-          onClick={() => setTab(3)}
-        >
-          Chart
-        </button>
-      </div>
-      <AppContext.Provider value={{ selectedCoin, setSelectedCoin }}>
-        <CoinsBanner />
-      </AppContext.Provider>
-      <div className="Statistics">
-        {tab === 1 ? (
-          <DetailedStats coin={selectedCoin} data={data} />
-        ) : tab === 2 ? (
-          <BinanceDataTable coin={selectedCoin} />
-        ) : (
-          <Chart coin={selectedCoin} />
-        )}
-      </div>
-
-      {/* <div className="Statistics">{ tab === 1 ? <DataFromDB coin={selectedCoin} /> : <Chart coin={selectedCoin} /> }</div> */}
-      {/* <div className="Statistics">{ tab === 1 ? <MainTable coin={selectedCoin} /> : <Chart coin={selectedCoin} /> }</div> */}
-    </>
-  );
+  //else
+    if (loading) {
+      return "Loading data ..."
+    }
+    else {
+      return (
+        <>
+          <div className="View-type-switch">
+            <button className={tab === 1 ? "View-type-switch-selected" : "View-type-switch-unselected"} onClick={() => setTab(1)}>
+              Detailed Statistics
+            </button>
+            <button className={tab === 2 ? "View-type-switch-selected" : "View-type-switch-unselected"} onClick={() => setTab(2)}>
+              Price Change Percentage Table
+            </button>
+            <button className={tab === 3 ? "View-type-switch-selected" : "View-type-switch-unselected"} onClick={() => setTab(3)}>
+              Chart
+            </button>
+          </div>
+          <AppContext.Provider value={{ selectedCoin, setSelectedCoin }}>
+            <CoinsBanner />
+          </AppContext.Provider>
+          <div className="Statistics">
+            {tab === 1 ? (
+              <DetailedStats coin={selectedCoin} testData={BTCUSDTDataObj} data={data} msg={message ? message : error} />
+            ) : tab === 2 ? (
+              <BinanceDataTable coin={selectedCoin} />
+            ) : (
+              <Chart coin={selectedCoin} />
+            )}
+          </div>
+        </>
+      );
+    }
 };
 
 export default MainView;
