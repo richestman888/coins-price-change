@@ -4,6 +4,7 @@ import Chart from "./Chart";
 import { AppContext } from "./AppContext";
 import BinanceDataTable from "./BinanceDataTable";
 import DetailedStats from "./DetailedStats";
+import { format } from "date-fns";
 import { Typography } from "@mui/material";
 // import MainTable from "./MainTable";
 // import DataFromDB from "./DataFromDB";
@@ -64,22 +65,22 @@ const MainView = () => {
         setLoading(false);
 
         /*   START: Test print BTCUSDT data only  */
-        // const BTCUSDTData = data.map((item) => ({ symbol: item.symbol,
-        //                                           priceChangePercent: parseFloat(item.priceChangePercent)}))                                                
-        //                         .filter((item) => item.symbol === "BTCUSDT");        
-        // console.log(BTCUSDTData)
+        const BTCUSDTData = data.map((item) => ({ symbol: item.symbol,
+                                                  priceChangePercent: parseFloat(item.priceChangePercent)}))                                                
+                                .filter((item) => item.symbol === "BTCUSDT");        
+        console.log(BTCUSDTData)
 
-        // const BTCUSDTDataArr = BTCUSDTData.map((item) => Object.entries(item))
-        // console.log(BTCUSDTDataArr)
+        const BTCUSDTDataArr = BTCUSDTData.map((item) => Object.entries(item))
+        console.log(BTCUSDTDataArr)
 
-        // const BTCUSDTDataObject = Object.fromEntries(BTCUSDTDataArr)
-        // console.log(BTCUSDTDataObject)  
+        const BTCUSDTDataObject = Object.fromEntries(BTCUSDTDataArr)
+        console.log(BTCUSDTDataObject)  
 
-        // const BTCUSDTDataArr2 = BTCUSDTDataArr.map((item) => Object.fromEntries(item))
-        // console.log(BTCUSDTDataArr2)
+        const BTCUSDTDataArr2 = BTCUSDTDataArr.map((item) => Object.fromEntries(item))
+        console.log(BTCUSDTDataArr2)
 
-        // setBTCUSDTDataObj({symbol: BTCUSDTDataArr2[0].symbol, priceChangePercent: BTCUSDTDataArr2[0].priceChangePercent})
-        // console.log(BTCUSDTDataObj)
+        setBTCUSDTDataObj({symbol: BTCUSDTDataArr2[0].symbol, priceChangePercent: BTCUSDTDataArr2[0].priceChangePercent})
+        console.log(BTCUSDTDataObj)
         /*   END: Test print BTCUSDT data only  */
 
         /*   All selected coins  */
@@ -91,7 +92,6 @@ const MainView = () => {
 
         const selectedCoinsDataObject = Object.fromEntries(selectedCoinsDataArr)
         console.log(selectedCoinsDataObject)
-
 
 
         // Send the filtered data to the backend 
@@ -106,13 +106,13 @@ const MainView = () => {
             }),
           }
         );
-                          if (response2.ok) {
-                            setMessage("Data saved to MongoDB successfully");
-                            setError("");
-                          } else {
-                            setMessage("");
-                            setError("Error saving data to MongoDB");
-                          }
+      if (response2.ok) {
+        setMessage("Data saved to MongoDB successfully");
+        setError("");
+      } else {
+        setMessage("");
+        setError("Error saving data to MongoDB");
+      }
       } catch (error) {
         setError("Error returned from system: " + error.message);
         setLoading(false)
@@ -120,24 +120,8 @@ const MainView = () => {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 600000); // Set up an interval to fetch data
-
-    // const resetCountdown = () => {
-    //   setRefreshRateCountdown(10)
-    // }
-
-    // let interval_countdown = null;
-    // if (isActive && refreshRateCountdown > 0) {
-    //   interval_countdown = setInterval(() => {
-    //     setRefreshRateCountdown(refreshRateCountdown => refreshRateCountdown - 1);
-    //   }, 1000);
-    // }
-    // else if (refreshRateCountdown === 0) {
-    //   setTimeout(() => {setRefreshRateCountdown(10)}, 1000)
-    // }
-
-    // Clear the interval when the component unmounts
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchData, 60000); // Set up an interval to fetch data
+    return () => clearInterval(interval);          // Clear the interval when the component unmounts
   }, []);
 
   // if (error) {

@@ -8,3 +8,18 @@ Steps to find the above endpoint:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 This app is working as at 12 Jan 2.00am
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+{
+    date: dd.mm.yyyy,
+    hourlytimeframe: "hh:mm",
+    BTCUSDT: 0.111,
+    ETHUSDT: 0.222,
+    BNBUSDT: 0.333,
+    LTCUSDT: 0.444
+    ...
+    ...
+    DOTUSDT: 0.111,
+    SUSHIUSDT: 0.222
+}

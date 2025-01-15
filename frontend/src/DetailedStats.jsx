@@ -1,13 +1,17 @@
 import React from 'react'
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper} from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 
 const DetailedStats = ({ coin, error, testData, data, msg }) => {   
+  const style = {
+    color: error ? "red" : "green",
+    fontWeight: "bold"
+  }
+
   return (
     <>
       <button onClick={() => window.location.reload()}>Reload Data</button>
       <h4>Data saved to DB status: </h4>
-      {/* <h4 style={{ color: msg.includes("successfully") ? "green" : "red" }}>{msg}</h4> */}
-      <h4>{msg}</h4>
+      <h4 style={style}>{msg}</h4>
       <button onClick={() => alert(testData.symbol + " " + testData.priceChangePercent)}>show BTCUSDT data</button>
       <h4>{testData.symbol}, {testData.priceChangePercent}</h4>
       <h2 align="center">Detailed Statistics: {coin}</h2>

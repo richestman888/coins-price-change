@@ -4,22 +4,22 @@ import cors from "cors";
 import colors from "colors";
 import { connectToMongoDBCrypto } from "./db/db.js";
 
-const app = express();
+const appCrypto = express();
 const PORT = 6060;
-app.use(cors());
-app.use(express.json());
+appCrypto.use(cors());
+appCrypto.use(express.json());
 
-app.listen(PORT, async () => {
-  const testConnection = await connectToMongoDBCrypto();
+appCrypto.listen(PORT, async () => {
+  const cryptoConn = await connectToMongoDBCrypto();
   const cryptoSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
     coins: Map,
   });
 
-  const CryptoData = testConnection.model("CryptoData", cryptoSchema);
+  const CryptoData = cryptoConn.model("CryptoData", cryptoSchema);
 
   // Endpoint to save crypto data
-  app.post("/api/saveCryptoData", async (req, res) => {
+  appCrypto.post("/api/saveCryptoData", async (req, res) => {
     const { timestamp, coins } = req.body;
     const newEntry = new CryptoData({ timestamp, coins });
     try {

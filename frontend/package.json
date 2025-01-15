@@ -11,6 +11,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.7",
+    "colors": "^1.4.0",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
@@ -24,9 +25,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "check-server": "node check-server.js",
+    "check-server": "nodemon check-server.js",
     "start-react": "react-scripts start",
-    "start": "npm run check-server && npm run start-react",
+    "startOriginal": "npm run check-server && npm run start-react",
+    "start": "node backend-servers.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
