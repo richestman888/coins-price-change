@@ -1,6 +1,6 @@
 import React from 'react'
 
-const BackupProjectToGithub = () => {
+const BackupToGithubReminder = () => {
   return (
     <>
       <div className="backup-notification">Backup Project To Github</div>
@@ -8,4 +8,4 @@ const BackupProjectToGithub = () => {
   );
 };
 
-export default BackupProjectToGithub
+export default BackupToGithubReminder
