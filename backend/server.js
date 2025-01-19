@@ -36,17 +36,20 @@ appCrypto.use(express.json());
   appCrypto.listen(PORT2, async () => {
   const cryptoConn = await connectToMongoDBCrypto();
   const cryptoSchema = new mongoose.Schema({
-    timestamp: { type: Date, default: Date.now },
-    coins: Map,
-  });
-
+    _id: {
+      type: String,
+      default: () => new mongoose.Types.ObjectId().toString(),
+    },
+    hourlyTF: String,
+    coins: Object
+  }, {versionKey: false});
 
   const year2025 = cryptoConn.model("2025", cryptoSchema);
 
   // Endpoint to save crypto data
   appCrypto.post("/api/saveCryptoData", async (req, res) => {
-    const { timestamp, coins } = req.body;
-    const newEntry = new year2025({ timestamp, coins });
+    const { _id, hourlyTF, coins } = req.body;
+    const newEntry = new year2025({ _id, hourlyTF, coins });
     try {
       await newEntry.save();
       res.status(201).send("Data saved successfully");
