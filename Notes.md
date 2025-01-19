@@ -1,4 +1,4 @@
-Source of crypto statistics: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-api-information
+Source of Binance crypto statistics: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-api-information
 
 Steps to find the above endpoint:
 1. visit www.binance.com
@@ -7,9 +7,11 @@ Steps to find the above endpoint:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-This app is working as at 12 Jan 2.00am
+This app is working as at 19 Jan 3.49am
 
 //////////////////////////////////////////////////////////////////////////////////////////
+
+Document format in mongoDB:
 
 {
     date: dd.mm.yyyy,
@@ -17,7 +19,7 @@ This app is working as at 12 Jan 2.00am
     BTCUSDT: 0.111,
     ETHUSDT: 0.222,
     BNBUSDT: 0.333,
-    LTCUSDT: 0.444
+    LTCUSDT: 0.444,
     ...
     ...
     DOTUSDT: 0.111,

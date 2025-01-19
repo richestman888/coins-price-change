@@ -9,9 +9,8 @@ const BackupReminder = () => {
   const [isWindowLoadedFirstTime, setIsWindowLoadedFirstTime] = useState(false);
 
   useEffect(() => {   // This code runs only once, after the initial render 
-    console.log('Page loaded for the first time');
     // Perform any action you need on the initial load here 
-    setIsWindowLoadedFirstTime(true);
+    setIsWindowLoadedFirstTime(true);  // To detect if the window is loaded for the first time
   }, []);
 
   let i = 0
@@ -21,7 +20,7 @@ const BackupReminder = () => {
 
       const today = new Date();
       const day = today.getDate();
-      setShouldBlink([19, 10, 20, 30].includes(day));
+      setShouldBlink([10, 20, 30].includes(day));
       // alert(`${i} value of cancelClicked in parent component : ${cancelClicked}`)
       // cancelClicked ? setShouldBlink(false) : setShouldBlink([16, 10, 20, 30].includes(day));
       // alert(`${i} value of shouldBlink in parent component: ${shouldBlink}`)

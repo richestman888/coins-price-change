@@ -15,7 +15,8 @@ const MainView = () => {
   const [tab, setTab] = useState(1);
   const [selectedCoin, setSelectedCoin] = useState("All Coins");
   const [data, setData] = useState([]);
-  const [BTCUSDTDataObj, setBTCUSDTDataObj] = useState({symbol: "", priceChangePercent: 0.00});
+  const [BTCUSDTDataObj, setBTCUSDTDataObj] = useState({ symbol: "", priceChangePercent: 0.00 });
+  const [selectedDataObj, setSelectedDataObj] = useState({});
   const [loading, setLoading] = useState(true);
   const [cryptoData, setCryptoData] = useState([]);
   const [message, setMessage] = useState("");
@@ -64,34 +65,24 @@ const MainView = () => {
         setData(filteredData);
         setLoading(false);
 
-        /*   START: Test print BTCUSDT data only  */
-        const BTCUSDTData = data.map((item) => ({ symbol: item.symbol,
-                                                  priceChangePercent: parseFloat(item.priceChangePercent)}))                                                
-                                .filter((item) => item.symbol === "BTCUSDT");        
-        console.log(BTCUSDTData)
-
-        const BTCUSDTDataArr = BTCUSDTData.map((item) => Object.entries(item))
-        console.log(BTCUSDTDataArr)
-
-        const BTCUSDTDataObject = Object.fromEntries(BTCUSDTDataArr)
-        console.log(BTCUSDTDataObject)  
-
-        const BTCUSDTDataArr2 = BTCUSDTDataArr.map((item) => Object.fromEntries(item))
-        console.log(BTCUSDTDataArr2)
-
-        setBTCUSDTDataObj({symbol: BTCUSDTDataArr2[0].symbol, priceChangePercent: BTCUSDTDataArr2[0].priceChangePercent})
-        console.log(BTCUSDTDataObj)
-        /*   END: Test print BTCUSDT data only  */
-
-        /*   All selected coins  */
-        const selectedCoinsData = data.map((item) => ({ symbol: item.symbol, priceChangePercent: parseFloat(item.priceChangePercent), })); 
-        console.log(selectedCoinsData)
-
-        const selectedCoinsDataArr = selectedCoinsData.map((item) => Object.entries(item))
-        console.log(selectedCoinsDataArr)
-
-        const selectedCoinsDataObject = Object.fromEntries(selectedCoinsDataArr)
-        console.log(selectedCoinsDataObject)
+        /*   START: Test print selected coins only  */
+        const selectedCoinsPPC = data.map((item) => ({ symbol: item.symbol, priceChangePercent: parseFloat(item.priceChangePercent) }))
+                                .filter((item) => item.symbol === "ADAUSDT" || item.symbol === "ATOMUSDT" || item.symbol === "BCHUSDT" ||
+                                    item.symbol === "BNBUSDT" || item.symbol === "BTCUSDT" || item.symbol === "CHZUSDT" ||
+                                    item.symbol === "COMPUSDT" || item.symbol === "CRVUSDT" || item.symbol === "DOGEUSDT" ||
+                                    item.symbol === "DOTUSDT" || item.symbol === "EOSUSDT" || item.symbol === "ETCUSDT" ||
+                                    item.symbol === "ETHUSDT" || item.symbol === "LINKUSDT" || item.symbol === "LTCUSDT" ||
+                                    item.symbol === "SANDUSDT" || item.symbol === "SOLUSDT" || item.symbol === "SUSHIUSDT" ||
+                                    item.symbol === "TRXUSDT" || item.symbol === "XRPUSDT")
+                                .map((item) => Object.entries(item))
+                                .map((item) => Object.fromEntries(item))
+                                .reduce((acc, coin) => {
+                                    acc[coin.symbol] = coin.priceChangePercent
+                                    return acc
+                                }, {})
+        console.log("selectedCoinsPPC:");
+        console.log(selectedCoinsPPC);
+        /*   END: Test print selected coins only  */
 
 
         // Send the filtered data to the backend 
@@ -102,7 +93,7 @@ const MainView = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               timestamp: new Date(),
-              coins: BTCUSDTDataObj,
+              coins: selectedCoinsPPC,
             }),
           }
         );
@@ -120,7 +111,7 @@ const MainView = () => {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 60000); // Set up an interval to fetch data
+    const interval = setInterval(fetchData, 300000); // Set up an interval to fetch data
     return () => clearInterval(interval);          // Clear the interval when the component unmounts
   }, []);
 
@@ -158,7 +149,7 @@ const MainView = () => {
           </AppContext.Provider>
           <div className="Statistics">
             {tab === 1 ? (
-              <DetailedStats coin={selectedCoin} error={error} testData={BTCUSDTDataObj} data={data} msg={message ? message : error} />
+              <DetailedStats coin={selectedCoin} error={error} data={data} msg={message ? message : error} />
             ) : tab === 2 ? (
               <BinanceDataTable coin={selectedCoin} />
             ) : (

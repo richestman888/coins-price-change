@@ -24,7 +24,7 @@ const BackupToGithub = ({ when, username, repository }) => {
 
   return (
     <div>
-      <h3>{when === "last" ? "Last" : "Current"} backup to GitHub</h3>
+      <h4>{when === "last" ? "Last" : "Current"} backup to GitHub</h4>
       {lastPush ? (
         <div>
           <p align="center">

@@ -3,7 +3,7 @@ import DateTime from './DateTime'
 import Topbanner from './Topbanner'
 import Dashboard from './Dashboard'
 // import IPConnectionChecker from './IPConnectionChecker.js';
-import './App.css'
+import './styles/App.css'
 
 const Home = () => {
     return (
