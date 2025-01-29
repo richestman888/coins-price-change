@@ -1,17 +1,108 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import DeleteDocsIntervalInput from "./DeleteDocsIntervalInput";
 
-const DetailedStats = ({ coin, error, data, msg }) => {   
-  const style = {
+const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscoredIdDeletionResult, redundantDeletionResult, onIntervalChange, nonUnderscoredIdDocsCount, redundantDocsCount, notifyDeletingNonUnderscoredIdDocs, notifyDeletingRedundantDocs }) => {   
+  const fetchDataStyle = {
     color: error ? "red" : "green",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    marginLeft: "8px"
+  };
+
+  const deleteDocsStyle = {
+    color: deleteDocsError ? "red" : "green",
+    fontWeight: "bold",
+    marginLeft: "8px"
+  };
+
+  const outerContainerStyle = {
+    display: "flex",
+    flexDirection: "column"
   }
+
+  const containerStyle = {
+    display: "flex",
+    flexDirection: "column"
+  };
+
+  const rowStyle = {
+    display: "flex",
+    alignItems: "center",
+    padding: "0", // Remove padding 
+    margin: "0", // Remove margin 
+    lineHeight: "1.0"
+  };
+
+  const nonUnderscoredIdDeletionStyle = {
+    color: nonUnderscoredIdDocsCount > 0 ? "red" : "green", 
+    fontWeight: "bold",
+    marginLeft: "8px"
+  };
+
+    const redundantDeletionStyle = {
+      color: redundantDocsCount > 0 ? "red" : "green",
+      fontWeight: "bold",
+      marginLeft: "8px"
+    };
+
 
   return (
     <>
       <button onClick={() => window.location.reload()}>Reload Data</button>
-      <h4>Data saved to DB status: </h4>
-      <h4 style={style}>{msg}</h4>
+      <div style={outerContainerStyle}>
+        <div style={containerStyle}>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>Data saved to DB status: </h4>
+            <h4 style={{ ...fetchDataStyle, margin: "0", marginLeft: "8px" }}>
+              {msg}
+            </h4>
+          </div>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>
+              Non-underscored ID documents deleted:{" "}
+            </h4>
+            <h4 style={{ ...deleteDocsStyle, margin: "0", marginLeft: "8px" }}>
+              {nonUnderscoredIdDeletionResult}
+            </h4>
+          </div>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>Redundant documents deleted: </h4>
+            <h4 style={{ ...deleteDocsStyle, margin: "0", marginLeft: "8px" }}>
+              {redundantDeletionResult}
+            </h4>
+          </div>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>Non-underscored Id docs count: </h4>
+            <h4
+              style={{
+                ...nonUnderscoredIdDeletionStyle,
+                margin: "0",
+                marginLeft: "8px",
+              }}
+            >
+              {nonUnderscoredIdDocsCount}
+            </h4>
+          </div>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>Redundant docs count: </h4>
+            <h4
+              style={{
+                ...redundantDeletionStyle,
+                margin: "0",
+                marginLeft: "8px",
+              }}
+            >
+              {redundantDocsCount}
+            </h4>
+          </div>
+        </div>
+        <DeleteDocsIntervalInput
+          min={0}
+          max={100}
+          step={1}
+          onIntervalChange={onIntervalChange}
+        />
+      </div>
       <h2 align="center">Detailed Statistics: {coin}</h2>
       <div className="p-4">
         <TableContainer component={Paper}>

@@ -4,26 +4,28 @@ import Chart from "./Chart";
 import { AppContext } from "./AppContext";
 import BinanceDataTable from "./BinanceDataTable";
 import DetailedStats from "./DetailedStats";
-import { format } from "date-fns";
+import { format, interval } from "date-fns";
 import { Typography } from "@mui/material";
 
 const MainView = () => {
   const [tab, setTab] = useState(1);
   const [selectedCoin, setSelectedCoin] = useState("All Coins");
   const [data, setData] = useState([]);
-  const [BTCUSDTDataObj, setBTCUSDTDataObj] = useState({ symbol: "", priceChangePercent: 0.00 });
   const [selectedDataObj, setSelectedDataObj] = useState({});
   const [loading, setLoading] = useState(true);
   const [cryptoData, setCryptoData] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
+  const [deleteDocsError, setDeleteDocsError] = useState(null);
   const [isActive, setIsActive] = useState(true);
-  // const [refreshRate, setRefreshRate] = useState('10 secs');
-  // const [refreshRateCountdown, setRefreshRateCountdown] = useState(10);
-
-  // const handleSelect = (event) => {
-  //   setRefreshRate(event)
-  // }
+  const [nonUnderscoredIdDeletionResult, setNonUnderscoredIdDeletionResult] = useState("");
+  const [redundantDeletionResult, setRedundantDeletionResult] = useState("");
+  const [fetchDataInterval, setFetchDataInterval] = useState(3600000);
+  const [deleteDocsInterval, setDeleteDocsInterval] = useState(1000);
+  const [nonUnderscoredIdDocsCount, setNonUnderscoredIdDocsCount] = useState(0);
+  const [redundantDocsCount, setRedundantDocsCount] = useState(0);
+  const [notifyDeletingNonUnderscoredIdDocs, setNotifyDeletingNonUnderscoredIdDocs] = useState("");
+  const [notifyDeletingRedundantDocs, setNotifyDeletingRedundantDocs] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,8 +100,6 @@ const MainView = () => {
             acc[coin.symbol] = coin.priceChangePercent;
             return acc;
           }, {});
-        // console.log("selectedCoinsPPC:");
-        // console.log(selectedCoinsPPC);
         /*   END: Test print selected coins only  */
 
         // Generate _id using "yyyyMMdd hh:mm:ss" format
@@ -154,39 +154,117 @@ const MainView = () => {
               _id: formattedDate,
               hourlyTF: hourlyTimeframe(),
               coins: selectedCoinsPPC
-            }),
+            })
           }
         );
         if (response2.ok) {
-          setMessage("Data saved to MongoDB successfully");
+          setMessage(`Data saved to MongoDB every ${fetchDataInterval/(1000 * 60 * 60)} hour successfully`);
           setError("");
         } else {
           setMessage("");
           setError("Error saving data to MongoDB");
         }
       } catch (error) {
-        setError("Error returned from system: " + error.message);
+        setError(error.message);
         setLoading(false)
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 3600000); // Set up an interval of 1 hour to fetch data
-    return () => clearInterval(interval);          // Clear the interval when the component unmounts
+    const interval = setInterval(fetchData, fetchDataInterval); // Set up an interval of 1 hour to fetch data
+    return () => { clearInterval(interval); }  // Clear the interval when the component unmounts
   }, []);
 
-  // if (error) {
-  //   return (
-  //     <>
-  //       <Typography color="error">
-  //         Error: {error} Please check if you are connected to ProtonVPN/TurboVPN via browser extension.
-  //       </Typography>
-  //       <button onClick={window.location.reload()}>Reload page</button>
-  //     </>
-  //   );
-  // }
+  /* Find out the count of non-underscored ID documents and redundant documents */
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        /* Find out the count of non-underscored ID documents */
+        const response1 = await fetch("http://localhost:6060/api/countDocsWithoutUnderscoreID");
+        const result1 = await response1.json();
+        setNonUnderscoredIdDocsCount(result1.count);
+        // alert(`Non-underscored ID count 1: ${result.count}`);
+        // alert(`Non-underscored ID count 2: ${nonUnderscoredIdDocsCreatedCount}`);
 
-  //else
+        /* Find out the count of redundant documents */
+        const response2 = await fetch("http://localhost:6060/api/countRedundantDocuments");
+        const result2 = await response2.json();
+        setRedundantDocsCount(result2.count);
+        alert(`Redundant docs count: ${result2.count}`);
+        alert(`Redundant docs count: ${redundantDocsCount}`);
+      } catch (error) {
+        console.error("Error fetching non-underscored ID or redundant count:", error);
+      }
+    };
+
+    fetchCount();
+    const interval = setInterval(fetchCount, 1000); // Run every 1 seconds
+    return () => clearInterval(interval);
+  }, [])
+
+  /* Delete non-underscored ID documents and redundant documents */
+  useEffect(() => {
+    const sendIntervalToBackend = async () => {
+      try {
+        const response = await fetch("http://localhost:6060/api/setInterval", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deleteDocsInterval })
+        });
+        const result = await response.json();
+        console.log("send delete docs interval to backend status: " + result.message);
+      } catch (error) {
+        console.error("Error sending interval:", error);
+      }
+    };
+    sendIntervalToBackend();
+
+    
+    const deleteNonUnderscoredDocuments = async () => {
+      try {
+        setNotifyDeletingNonUnderscoredIdDocs("Deleting non-underscored ID documents...");
+        const response = await fetch(
+          "http://localhost:6060/api/deleteNonUnderscoredDocuments",
+          { method: "DELETE" }
+        );
+        const result = await response.text();
+        setNonUnderscoredIdDeletionResult(result);
+        setNotifyDeletingNonUnderscoredIdDocs("Deletion of non-underscored ID documents completed");
+        DelayNode(2000)
+        setNotifyDeletingNonUnderscoredIdDocs("")
+      } catch (error) {
+        setDeleteDocsError(error.message);
+        setNonUnderscoredIdDeletionResult(error);
+      }
+    };
+
+    if (nonUnderscoredIdDocsCount > 0)
+      deleteNonUnderscoredDocuments();
+
+    const deleteRedundantDocuments = async () => {
+      setNotifyDeletingRedundantDocs("Deleting redundant documents...");
+      try {
+        const response = await fetch(
+          "http://localhost:6060/api/deleteRedundantDocuments",
+          { method: "DELETE" }
+        );
+        const result = await response.text();
+        setRedundantDeletionResult(result);
+        setNotifyDeletingRedundantDocs("Deletion of redundant documents completed");
+      } catch (error) {
+        setDeleteDocsError(error.message);
+        setRedundantDeletionResult(error);
+      }
+    };
+
+    if (redundantDocsCount > 0)
+      deleteRedundantDocuments();
+  }, [nonUnderscoredIdDocsCount, redundantDocsCount]);
+
+  const handleIntervalChange = (newInterval) => {
+    setDeleteDocsInterval(newInterval * 1000); // Convert to milliseconds 
+  };
+  
     if (loading) {
       return "Loading data ..."
     }
@@ -194,13 +272,34 @@ const MainView = () => {
       return (
         <>
           <div className="View-type-switch">
-            <button className={tab === 1 ? "View-type-switch-selected" : "View-type-switch-unselected"} onClick={() => setTab(1)}>
+            <button
+              className={
+                tab === 1
+                  ? "View-type-switch-selected"
+                  : "View-type-switch-unselected"
+              }
+              onClick={() => setTab(1)}
+            >
               Detailed Statistics
             </button>
-            <button className={tab === 2 ? "View-type-switch-selected" : "View-type-switch-unselected"} onClick={() => setTab(2)}>
+            <button
+              className={
+                tab === 2
+                  ? "View-type-switch-selected"
+                  : "View-type-switch-unselected"
+              }
+              onClick={() => setTab(2)}
+            >
               Price Change Percentage Table
             </button>
-            <button className={tab === 3 ? "View-type-switch-selected" : "View-type-switch-unselected"} onClick={() => setTab(3)}>
+            <button
+              className={
+                tab === 3
+                  ? "View-type-switch-selected"
+                  : "View-type-switch-unselected"
+              }
+              onClick={() => setTab(3)}
+            >
               Chart
             </button>
           </div>
@@ -209,7 +308,20 @@ const MainView = () => {
           </AppContext.Provider>
           <div className="Statistics">
             {tab === 1 ? (
-              <DetailedStats coin={selectedCoin} error={error} data={data} msg={message ? message : error} />
+              <DetailedStats
+                coin={selectedCoin}
+                error={error}
+                data={data}
+                msg={message ? message : error}
+                deleteDocsError={deleteDocsError}
+                nonUnderscoredIdDeletionResult={nonUnderscoredIdDeletionResult}
+                redundantDeletionResult={redundantDeletionResult}
+                onIntervalChange={handleIntervalChange}
+                nonUnderscoredIdDocsCount={nonUnderscoredIdDocsCount}
+                redundantDocsCount={redundantDocsCount}
+                notifyDeletingNonUnderscoredIdDocs={notifyDeletingNonUnderscoredIdDocs}
+                notifyDeletingRedundantDocs={notifyDeletingRedundantDocs}
+              />
             ) : tab === 2 ? (
               <BinanceDataTable coin={selectedCoin} />
             ) : (

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import DataFetcher3 from "./DataFetcher3";
+// import DataFetcher3 from "./DataFetcher3";
 // import DataFetcher2 from "./DataFetcher2"
 // import BinanceDataDisplay from "./BinanceDataDisplay"
 

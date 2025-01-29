@@ -7,9 +7,25 @@ Steps to find the above endpoint:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-This app is working as at 19 Jan 3.49am
+This app is working as at 26 Jan 16.12
+
+Achievement:
+1. Successfully fetch, filter, format fetched data into object format to be saved into mongodb
+2. Successfully delete unwanted documents in mongodb
+3. Successfully format mongodb document format into custom format
 
 //////////////////////////////////////////////////////////////////////////////////////////
+
+Monitoring work in progress:
+1. Successful document deletion from 26 Jan 00:00 onwards
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+Issues encountered:
+1. Documents with non-underscored id are created from nowhere
+2. Documents with same date and same hourlyTF are created
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 Document format in mongoDB:
 

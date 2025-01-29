@@ -131,3 +131,64 @@ const MainView = () => {
 }
 
 export default MainView;
+
+////////////////////////////////////////////////////////////
+
+  return (
+    <>
+      <div style={outerContainerStyle}>
+        <div style={containerStyle}>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>Data saved to DB status: </h4>
+            <h4 style={{ ...fetchDataStyle, margin: "0", marginLeft: "8px" }}>
+              {msg}
+            </h4>
+          </div>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>
+              Non-underscored ID documents deleted:{" "}
+            </h4>
+            <h4 style={{ ...deleteDocsStyle, margin: "0", marginLeft: "8px" }}>
+              {nonUnderscoredIdDeletionResult}
+            </h4>
+          </div>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>Redundant documents deleted: </h4>
+            <h4 style={{ ...deleteDocsStyle, margin: "0", marginLeft: "8px" }}>
+              {redundantDeletionResult}
+            </h4>
+          </div>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>Non-underscored Id docs count: </h4>
+            <h4
+              style={{
+                ...nonUnderscoredIdDeletionStyle,
+                margin: "0",
+                marginLeft: "8px",
+              }}
+            >
+              {nonUnderscoredIdDocsCount}
+            </h4>
+          </div>
+          <div style={rowStyle}>
+            <h4 style={{ margin: "0" }}>Redundant docs count: </h4>
+            <h4
+              style={{
+                ...redundantDeletionStyle,
+                margin: "0",
+                marginLeft: "8px",
+              }}
+            >
+              {redundantDocsCount}
+            </h4>
+          </div>
+        </div>
+        <DeleteDocsIntervalInput
+          min={0}
+          max={100}
+          step={1}
+          onIntervalChange={onIntervalChange}
+        />
+      </div>
+    </>
+  );

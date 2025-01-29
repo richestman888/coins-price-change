@@ -4,7 +4,6 @@ import Register2 from "./pages/Register2"
 import {BrowserRouter, Routes, Route} from "react-router-dom"
 
 function App() {
-
   return (
       <BrowserRouter>
         <Routes>
