@@ -6,6 +6,7 @@ import BinanceDataTable from "./BinanceDataTable";
 import DetailedStats from "./DetailedStats";
 import { format, interval } from "date-fns";
 import { Typography } from "@mui/material";
+import LoadingDataNotification from "./LoadingDataNotification";
 
 const MainView = () => {
   const [tab, setTab] = useState(1);
@@ -102,19 +103,31 @@ const MainView = () => {
           }, {});
         /*   END: Test print selected coins only  */
 
-        // Generate _id using "yyyyMMdd hh:mm:ss" format
+        // Generate _id using "yyyyMMdd_hhmmss" format
+        const formatDateTime = (date) => {
+          const dateObj = {}
+          dateObj.year = date.getFullYear();
+          dateObj.month = String(date.getMonth() + 1).padStart(2, "0");
+          dateObj.day = String(date.getDate()).padStart(2, "0");
+          dateObj.hours = String(date.getHours()).padStart(2, "0");
+          dateObj.minutes = String(date.getMinutes()).padStart(2, "0");
+          dateObj.seconds = String(date.getSeconds()).padStart(2, "0");
+          return dateObj;
+        };
+
         const formatDate = (date) => {
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, "0");
-          const day = String(date.getDate()).padStart(2, "0");
-          const hours = String(date.getHours()).padStart(2, "0");
-          const minutes = String(date.getMinutes()).padStart(2, "0");
-          const seconds = String(date.getSeconds()).padStart(2, "0");
-          return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+          const dateObj = formatDateTime(date);
+          return `${dateObj.year}${dateObj.month}${dateObj.day}_${dateObj.hours}${dateObj.minutes}${dateObj.seconds}`;
+        };
+
+        const formatDate2 = (date) => {
+          const dateObj = formatDateTime(date);
+          return `${dateObj.year}-${dateObj.month}-${dateObj.day}_${dateObj.hours}:${dateObj.minutes}:${dateObj.seconds}`;
         };
 
         const date = new Date();
         const formattedDate = formatDate(date);
+        const formattedDate2 = formatDate2(date);
         
         const hourlyTimeframe = () => {
           const hours = String(new Date().getHours()).padStart(2, "0");
@@ -158,7 +171,7 @@ const MainView = () => {
           }
         );
         if (response2.ok) {
-          setMessage(`Data saved to MongoDB every ${fetchDataInterval/(1000 * 60 * 60)} hour successfully`);
+          setMessage(`Last hourly data saved to MongoDB at ${formattedDate2} successfully`);
           setError("");
         } else {
           setMessage("");
@@ -168,12 +181,12 @@ const MainView = () => {
         setError(error.message);
         setLoading(false)
       }
-    };
+    };  
 
     fetchData();
     const interval = setInterval(fetchData, fetchDataInterval); // Set up an interval of 1 hour to fetch data
     return () => { clearInterval(interval); }  // Clear the interval when the component unmounts
-  }, []);
+  }, []);     
 
   /* Find out the count of non-underscored ID documents and redundant documents */
   useEffect(() => {
@@ -187,11 +200,11 @@ const MainView = () => {
         // alert(`Non-underscored ID count 2: ${nonUnderscoredIdDocsCreatedCount}`);
 
         /* Find out the count of redundant documents */
-        const response2 = await fetch("http://localhost:6060/api/countRedundantDocuments");
+        const response2 = await fetch("http://localhost:6060/api/countRedundantDocs");
         const result2 = await response2.json();
         setRedundantDocsCount(result2.count);
-        alert(`Redundant docs count: ${result2.count}`);
-        alert(`Redundant docs count: ${redundantDocsCount}`);
+        // alert(`Redundant docs count 1: ${result2.count}`);
+        // alert(`Redundant docs count 2: ${redundantDocsCount}`);
       } catch (error) {
         console.error("Error fetching non-underscored ID or redundant count:", error);
       }
@@ -219,7 +232,6 @@ const MainView = () => {
     };
     sendIntervalToBackend();
 
-    
     const deleteNonUnderscoredDocuments = async () => {
       try {
         setNotifyDeletingNonUnderscoredIdDocs("Deleting non-underscored ID documents...");
@@ -229,9 +241,9 @@ const MainView = () => {
         );
         const result = await response.text();
         setNonUnderscoredIdDeletionResult(result);
-        setNotifyDeletingNonUnderscoredIdDocs("Deletion of non-underscored ID documents completed");
-        DelayNode(2000)
-        setNotifyDeletingNonUnderscoredIdDocs("")
+        setNotifyDeletingNonUnderscoredIdDocs("Deleting non-underscored ID documents completed");
+        const timer = setTimeout(() => {setNotifyDeletingNonUnderscoredIdDocs("<Document deletion status will appear here>");}, 2000);
+        return () => clearTimeout(timer);
       } catch (error) {
         setDeleteDocsError(error.message);
         setNonUnderscoredIdDeletionResult(error);
@@ -250,7 +262,9 @@ const MainView = () => {
         );
         const result = await response.text();
         setRedundantDeletionResult(result);
-        setNotifyDeletingRedundantDocs("Deletion of redundant documents completed");
+        setNotifyDeletingRedundantDocs("Deleting redundant documents completed");
+        const timer = setTimeout(() => { setNotifyDeletingRedundantDocs("<Document deletion status will appear here>"); }, 2000);
+        return () => clearTimeout(timer);
       } catch (error) {
         setDeleteDocsError(error.message);
         setRedundantDeletionResult(error);
@@ -266,7 +280,7 @@ const MainView = () => {
   };
   
     if (loading) {
-      return "Loading data ..."
+      return <LoadingDataNotification />
     }
     else {
       return (

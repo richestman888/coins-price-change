@@ -39,12 +39,21 @@ const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscored
     marginLeft: "8px"
   };
 
-    const redundantDeletionStyle = {
-      color: redundantDocsCount > 0 ? "red" : "green",
-      fontWeight: "bold",
-      marginLeft: "8px"
-    };
+  const redundantDeletionStyle = {
+    color: redundantDocsCount > 0 ? "red" : "green",
+    fontWeight: "bold",
+    marginLeft: "8px"
+  };
 
+  const nonUnderscoredIdDocsDeletionNotifyStyle = {
+    color: notifyDeletingNonUnderscoredIdDocs === '<Document deletion status will appear here>' ? "light grey" : "black",
+    marginLeft: "8px"
+  };
+
+  const redundantDocsDeletionNotifyStyle = {
+    color: notifyDeletingRedundantDocs === '<Document deletion status will appear here>' ? "light grey" : "black",
+    marginLeft: "8px"
+  };
 
   return (
     <>
@@ -81,6 +90,9 @@ const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscored
               }}
             >
               {nonUnderscoredIdDocsCount}
+            </h4>
+            <h4 style={{ margin: "0", marginLeft: "8px" }}>
+              {notifyDeletingNonUnderscoredIdDocs}
             </h4>
           </div>
           <div style={rowStyle}>
