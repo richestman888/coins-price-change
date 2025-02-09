@@ -1,11 +1,10 @@
-// below is MainView_v2.jsx component that fetches data from binance server:
-
 import { React, useState, useEffect } from "react";
 import CoinsBanner from "./CoinsBanner";
 import Chart from "./Chart";
 import { AppContext } from "./AppContext";
 import BinanceDataTable from "./BinanceDataTable";
 import DetailedStats from "./DetailedStats";
+import { format, interval } from "date-fns";
 import LoadingDataNotification from "./LoadingDataNotification";
 
 const MainView_v2 = () => {
@@ -14,9 +13,11 @@ const MainView_v2 = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dataSavedToDBStatus, setDataSavedToDBStatus] = useState("");
+  const [httpError, setHttpError] = useState(null)
   const [error, setError] = useState(null);
   const [cleanliness, setCleanliness] = useState("");
   const [uniqueness, setUniqueness] = useState("");
+  const [deletionID, setDeletionID] = useState(null)
   const [deleteDocsError, setDeleteDocsError] = useState(null);
   const [nonUnderscoredIdDeletionResult, setNonUnderscoredIdDeletionResult] = useState("");
   const [redundantDeletionResult, setRedundantDeletionResult] = useState("");
@@ -26,6 +27,7 @@ const MainView_v2 = () => {
   const [redundantDocsCount, setRedundantDocsCount] = useState(0);
   const [notifyDeletingNonUnderscoredIdDocs, setNotifyDeletingNonUnderscoredIdDocs] = useState("<Document deletion status will appear here>");
   const [notifyDeletingRedundantDocs, setNotifyDeletingRedundantDocs] = useState("<Document deletion status will appear here>");
+  const [docsDeletionDetailsSavedToDBStatus, setDocsDeletionDetailsSavedToDBStatus] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,38 +36,45 @@ const MainView_v2 = () => {
           "https://api.binance.com/api/v3/ticker/24hr"
         );
         if (!response1.ok) {
-          throw new Error(`HTTP error! status: ${response1.status}`);
+          // throw new Error(`HTTP error! status: ${response1.status}`);
+          setHttpError(`HTTP error! status: ${response1.status}`);
+          alert(`${httpError}`)
         }
-        const data = await response1.json();
-        // Filter for some popular cryptocurrencies
-        const filteredData = data.filter((item) =>
-          [
-            "ADAUSDT",
-            "ATOMUSDT",
-            "BCHUSDT",
-            "BNBUSDT",
-            "BTCUSDT",
-            "CHZUSDT",
-            "COMPUSDT",
-            "CRVUSDT",
-            "DOGEUSDT",
-            "DOTUSDT",
-            "EOSUSDT",
-            "ETCUSDT",
-            "ETHUSDT",
-            "LINKUSDT",
-            "LTCUSDT",
-            "SANDUSDT",
-            "SOLUSDT",
-            "SUSHIUSDT",
-            "TRXUSDT",
-            "XRPUSDT",
-          ].includes(item.symbol)
-        );
-        setData(filteredData);
-        setLoading(false);
+        else {
+          const data = await response1.json();
+          const filteredData = data.filter(
+            (
+              item // Filter for some popular cryptocurrencies
+            ) =>
+              [
+                "ADAUSDT",
+                "ATOMUSDT",
+                "BCHUSDT",
+                "BNBUSDT",
+                "BTCUSDT",
+                "CHZUSDT",
+                "COMPUSDT",
+                "CRVUSDT",
+                "DOGEUSDT",
+                "DOTUSDT",
+                "EOSUSDT",
+                "ETCUSDT",
+                "ETHUSDT",
+                "LINKUSDT",
+                "LTCUSDT",
+                "SANDUSDT",
+                "SOLUSDT",
+                "SUSHIUSDT",
+                "TRXUSDT",
+                "XRPUSDT",
+              ].includes(item.symbol)
+          );
+          setHttpError(null)
+          setData(filteredData);
+          setLoading(false);
+        }
 
-        /*   START: Test print selected coins only  */
+        /*   START: Format fetched data into required format  */
         const selectedCoinsPPC = data
           .map((item) => ({
             symbol: item.symbol,
@@ -100,11 +109,11 @@ const MainView_v2 = () => {
             acc[coin.symbol] = coin.priceChangePercent;
             return acc;
           }, {});
-        /*   END: Test print selected coins only  */
+        /*   END: Format fetched data into required format  */
 
         // Generate _id using "yyyyMMdd_hhmmss" format
         const formatDateTime = (date) => {
-          const dateObj = {}
+          const dateObj = {};
           dateObj.year = date.getFullYear();
           dateObj.month = String(date.getMonth() + 1).padStart(2, "0");
           dateObj.day = String(date.getDate()).padStart(2, "0");
@@ -127,10 +136,10 @@ const MainView_v2 = () => {
         const date = new Date();
         const formattedDate = formatDate(date);
         const formattedDate2 = formatDate2(date);
-        
+
         const hourlyTimeframe = () => {
           const hours = String(new Date().getHours()).padStart(2, "0");
-          if (hours === "00")  return "00:00";
+          if (hours === "00") return "00:00";
           else if (hours === "01") return "01:00";
           else if (hours === "02") return "02:00";
           else if (hours === "03") return "03:00";
@@ -154,7 +163,7 @@ const MainView_v2 = () => {
           else if (hours === "21") return "21:00";
           else if (hours === "22") return "22:00";
           else if (hours === "23") return "23:00";
-        }
+        };
 
         // Send the filtered data to the backend
         const response2 = await fetch(
@@ -165,19 +174,21 @@ const MainView_v2 = () => {
             body: JSON.stringify({
               _id: formattedDate,
               hourlyTF: hourlyTimeframe(),
-              coins: selectedCoinsPPC
-            })
+              coins: selectedCoinsPPC,
+            }),
           }
         );
         if (response2.ok) {
-          setDataSavedToDBStatus(`Last hourly data saved to MongoDB at ${formattedDate2} successfully`);
+          setDataSavedToDBStatus(
+            `Last hourly data saved to MongoDB at ${formattedDate2} successfully`
+          );
           setError("");
         } else {
           setDataSavedToDBStatus("");
           setError("Error saving data to MongoDB");
         }
       } catch (error) {
-        setError(error.message);
+        setError(error.message + ". Please check your database connection");
         setLoading(false)
       }
     };         
@@ -195,6 +206,8 @@ const MainView_v2 = () => {
         const response1 = await fetch("http://localhost:6060/api/countDocsWithoutUnderscoreID");
         const result1 = await response1.json();
         setNonUnderscoredIdDocsCount(result1.count);
+        // alert(`Non-underscored ID count 1: ${result.count}`);
+        // alert(`Non-underscored ID count 2: ${nonUnderscoredIdDocsCreatedCount}`);
 
         /* Find out the count of redundant documents */
         const response2 = await fetch("http://localhost:6060/api/countRedundantDocs");
@@ -233,17 +246,20 @@ const MainView_v2 = () => {
       }
 
       setNotifyDeletingNonUnderscoredIdDocs("Deleting non-underscored ID documents...");
-      delay(2000);
+      await delay(2000);
       try {
         const response = await fetch(
           "http://localhost:6060/api/deleteNonUnderscoredDocuments",
           { method: "DELETE" }
         );
         const result = await response.text();
-        setNonUnderscoredIdDeletionResult(result);
-        setNotifyDeletingNonUnderscoredIdDocs("Deleting non-underscored ID documents completed");
-        delay(2000);
-        setNotifyDeletingNonUnderscoredIdDocs("<Document deletion status will appear here>");
+        if (response.status === 200) {
+          setDeletionID("01")
+          setNonUnderscoredIdDeletionResult(result);
+          setNotifyDeletingNonUnderscoredIdDocs("Deleting non-underscored ID documents completed");
+          await delay(2000);
+          setNotifyDeletingNonUnderscoredIdDocs("<Document deletion status will appear here>");
+        }
       } catch (error) {
         setDeleteDocsError(error.message);
         setNonUnderscoredIdDeletionResult(error.message);
@@ -259,17 +275,20 @@ const MainView_v2 = () => {
       }
 
       setNotifyDeletingRedundantDocs("Deleting redundant documents...");
-      delay(2000);
+      await delay(2000);
       try {
         const response = await fetch(
           "http://localhost:6060/api/deleteRedundantDocuments",
           { method: "DELETE" }
         );
         const result = await response.text();
-        setRedundantDeletionResult(result);
-        setNotifyDeletingRedundantDocs("Deleting redundant documents completed");
-        delay(2000);
-        setNotifyDeletingRedundantDocs("<Document deletion status will appear here>");
+        if (response.status === 200) {
+          setDeletionID("02");
+          setRedundantDeletionResult(result);
+          setNotifyDeletingRedundantDocs("Deleting redundant documents completed");
+          await delay(2000);
+          setNotifyDeletingRedundantDocs("<Document deletion status will appear here>");
+        }
       } catch (error) {
         setDeleteDocsError(error.message);
         setRedundantDeletionResult(error.message);
@@ -279,6 +298,28 @@ const MainView_v2 = () => {
     if (redundantDocsCount > 0)
       deleteRedundantDocuments();
   }, [nonUnderscoredIdDocsCount, redundantDocsCount]);   
+
+  /*  Record recent docs deletion to deletion database  */
+  useEffect(() => {
+    const recordRecentDocsDeletionDetails = async () => {
+      try {
+        const response = await fetch("http://localhost:7070/api/recordRecentDocsDeletionDetails", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            _id: deletionID,
+            deletion_type: deletionID === "01" ? "non-underscore ID" : "redundant",
+            last_deletion_date: format(new Date().toLocaleString, "dd-MM-yyyy HH:mm:ss")
+           })
+        });
+        const result = await response.json();
+        setDocsDeletionDetailsSavedToDBStatus(`Successful recorded docs deletion details: ${result.message}`);
+      } catch (error) {
+        console.error("Error recording docs deletion details:", error.message);
+      }
+    };
+    recordRecentDocsDeletionDetails()
+  }, [nonUnderscoredIdDocsCount, redundantDocsCount]);
 
   /*  To check if database is clean and unique before generating chart  */
   useEffect(() => {
@@ -335,6 +376,7 @@ const MainView_v2 = () => {
             {tab === 1 ? (
               <DetailedStats
                 coin={selectedCoin}
+                httpError={httpError}
                 error={error}
                 data={data}
                 dataSavedToDBStatus={dataSavedToDBStatus ? dataSavedToDBStatus : error}
@@ -359,38 +401,3 @@ const MainView_v2 = () => {
 };
 
 export default MainView_v2;
-
-// I want to plot a line chart whereby the horizontal axis represents the hourlyTF and the vertical axis represents the priceChangePercent. The data for the chart will be sourced from my mongodb
-// Please implement a component that plots the chart. User interface library
-
-/* Taken from server.js */
-  // Function to write allDocs to a notepad file
-  const writeToFile = async () => {
-    const allDocs = await year2025.find().sort({ _id: 1 });
-    const data = JSON.stringify(allDocs, null, 2);
-    fs.writeFile("allDocs.txt", data, (err) => {
-      if (err) throw err;
-      console.log("Data has been written to allDocs.txt");
-    });
-  };
-
-  // Call writeToFile function to write content to file
-  writeToFile();
-
-  // Function to write uniqueDocs to a notepad file
-  const writeUniqueDocsToFile = async (uniqueDocs) => {
-    const data = JSON.stringify(uniqueDocs, null, 2);
-    fs.writeFile("uniqueDocs.txt", data, (err) => {
-      if (err) throw err;
-      console.log("Data has been written to uniqueDocs.txt");
-    });
-  };
-
-  // Function to write redundantDocs to a notepad file
-  const writeRedundantDocsToFile = async (redundantDocs) => {
-    const data = JSON.stringify(redundantDocs, null, 2);
-    fs.writeFile("redundantDocs.txt", data, (err) => {
-      if (err) throw err;
-      console.log("Data has been written to redundantDocs.txt");
-    });
-  };

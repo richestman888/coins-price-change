@@ -273,7 +273,7 @@ const MainView = () => {
 
     if (redundantDocsCount > 0)
       deleteRedundantDocuments();
-  }, [nonUnderscoredIdDocsCount, redundantDocsCount]);
+  }, [nonUnderscoredIdDocsCount, redundantDocsCount]);   
 
   const handleIntervalChange = (newInterval) => {
     setDeleteDocsInterval(newInterval * 1000); // Convert to milliseconds 

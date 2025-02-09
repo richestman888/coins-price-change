@@ -41,3 +41,11 @@ Document format in mongoDB:
     DOTUSDT: 0.111,
     SUSHIUSDT: 0.222
 }
+
+///////////////////////////////////////////////////////
+
+MainView_2: using build-in useEffect hook
+MainView_3: using custom useEffect hook
+
+///////////////////////////////////////////////////////
+at 02 Feb 10:00, doc count on mongodb was 12. Make sure on 06 Feb at 00:00:01, doc count should be = 12 + (12 + 2) + 24 = 50

@@ -4,9 +4,9 @@ import cors from 'cors'
 import colors from "colors";
 import fs from "fs";
 import authRouter from './routes/auth.js'
-import {connectToMongoDBNoteApp, connectToMongoDBCrypto} from './db/db.js';
+import {connectToMongoDBNoteApp, connectToMongoDBYear2025, connectToMongoDBDeletion} from './db/db.js';
 
-/*  Connecting to user authentication server  */
+/*  Connecting to user authentication database  */
 const appAuth = express()
 const PORT1 = 5050
 appAuth.use(cors())
@@ -15,17 +15,17 @@ appAuth.use('/api/auth', authRouter)
 
 appAuth.listen(PORT1, () => {
   connectToMongoDBNoteApp();
-  console.log(`User authentication server is running on port ${PORT1}`.brightGreen);
+  console.log(`Connection to user authentication database is running on port ${PORT1}`.brightGreen);
 });
 
-/*     Connecting to crypto server      */
+/*  Connecting to 2025 database  */
 const appCrypto = express();
 const PORT2 = 6060;
 appCrypto.use(cors());
 appCrypto.use(express.json());
 
 appCrypto.listen(PORT2, async () => {
-  const cryptoConn = await connectToMongoDBCrypto();
+  const year2025Conn = await connectToMongoDBYear2025();
   const cryptoSchema = new mongoose.Schema(
     {
       _id: {
@@ -35,46 +35,15 @@ appCrypto.listen(PORT2, async () => {
       hourlyTF: String,
       coins: Object,
     },
-    { versionKey: false }
+    { versionKey: false, collection: "Feb" }
   );
 
-  const year2025 = cryptoConn.model("2025", cryptoSchema);
+  const Feb2025 = year2025Conn.model("Feb", cryptoSchema);
 
-  // Function to write allDocs to a notepad file
-  // const writeToFile = async () => {
-  //   const allDocs = await year2025.find().sort({ _id: 1 });
-  //   const data = JSON.stringify(allDocs, null, 2);
-  //   fs.writeFile("allDocs.txt", data, (err) => {
-  //     if (err) throw err;
-  //     console.log("Data has been written to allDocs.txt");
-  //   });
-  // };
-
-  // Call writeToFile function to write content to file
-  // writeToFile();
-
-  // Function to write uniqueDocs to a notepad file
-  // const writeUniqueDocsToFile = async (uniqueDocs) => {
-  //   const data = JSON.stringify(uniqueDocs, null, 2);
-  //   fs.writeFile("uniqueDocs.txt", data, (err) => {
-  //     if (err) throw err;
-  //     console.log("Data has been written to uniqueDocs.txt");
-  //   });
-  // };
-
-  // Function to write redundantDocs to a notepad file
-  const writeRedundantDocsToFile = async (redundantDocs) => {
-    const data = JSON.stringify(redundantDocs, null, 2);
-    fs.writeFile("redundantDocs.txt", data, (err) => {
-      if (err) throw err;
-      console.log("Data has been written to redundantDocs.txt");
-    });
-  };
-
-  // Endpoint to save crypto data
+  // Endpoint to save 2025Feb data
   appCrypto.post("/api/saveCryptoData", async (req, res) => {
     const { _id, hourlyTF, coins } = req.body;
-    const newEntry = new year2025({ _id, hourlyTF, coins });
+    const newEntry = new Feb2025({ _id, hourlyTF, coins });
     try {
       await newEntry.save();
       res.status(201).send("Data saved successfully");
@@ -95,7 +64,7 @@ appCrypto.listen(PORT2, async () => {
   /* Endpoint to delete documents with non-underscore ID  */
   appCrypto.delete("/api/deleteNonUnderscoredDocuments", async (req, res) => {
     try {
-      const result = await year2025.deleteMany({_id: { $not: { $regex: "_" } }});
+      const result = await Feb2025.deleteMany({_id: { $not: { $regex: "_" } }});
       res
         .status(200)
         .send(`Deleted ${result.deletedCount} documents with non-underscore ID every ${deleteInterval} seconds successfully`);
@@ -107,7 +76,7 @@ appCrypto.listen(PORT2, async () => {
   /*  Endpoint to delete redundant documents */
   appCrypto.delete("/api/deleteRedundantDocuments", async (req, res) => {
     try {
-      const allDocs = await year2025.find().sort({ _id: 1 });
+      const allDocs = await Feb2025.find().sort({ _id: 1 });
       const redundantDocs = [];
       const uniqueDocs = {};
 
@@ -121,11 +90,10 @@ appCrypto.listen(PORT2, async () => {
           redundantDocs.push(doc._id);
         }
       });
-      res.status(200).send(`Redundant docs count (sent from server): ${redundantDocs.length}`);
-      const result = await year2025.deleteMany({_id: { $in: redundantDocs }});
+      const result = await Feb2025.deleteMany({_id: { $in: redundantDocs }});
       res
         .status(200)
-        .send(`Deleted ${result.deletedCount} redundant documents successfully`);
+        .send(`Redundant docs count (sent from server): ${redundantDocs.length}. Deleted ${result.deletedCount} redundant documents successfully`);
     } catch (error) {
       res.status(500).json({ message: "Error deleting redundant documents" });
     }
@@ -133,7 +101,7 @@ appCrypto.listen(PORT2, async () => {
 
   appCrypto.get("/api/countDocsWithoutUnderscoreID", async (req, res) => {
     try {
-      const docs = await year2025.find();
+      const docs = await Feb2025.find();
       const count = docs.filter((doc) => !doc._id.includes("_")).length;
       res.status(200).json({ count });
     } catch (error) {
@@ -145,7 +113,7 @@ appCrypto.listen(PORT2, async () => {
 
   appCrypto.get("/api/countRedundantDocs", async (req, res) => {
     try {
-      const allDocs = await year2025.find().sort({ _id: 1 });
+      const allDocs = await Feb2025.find().sort({ _id: 1 });
       const redundantDocs = [];
       const uniqueDocs = {};
 
@@ -166,11 +134,65 @@ appCrypto.listen(PORT2, async () => {
       // writeUniqueDocsToFile(uniqueDocs);
 
       // Write redundantDocs to file
-      writeRedundantDocsToFile(redundantDocs);
+      // writeRedundantDocsToFile(redundantDocs);
     } catch (error) {
       res.status(500).json({ message: "Error counting redundant documents" });
     }
   });
 
-  console.log(`Crypto server is running on port ${PORT2}`.brightGreen);
+  console.log(`Connection to 2025 database is running on port ${PORT2}`.brightGreen);
+});
+
+/*  Connecting to deletion database  */
+const appDeletion = express()
+const PORT3 = 7070
+appDeletion.use(cors())
+appDeletion.use(express.json())
+
+appDeletion.listen(PORT3, async () => {
+  const deletionConn = await connectToMongoDBDeletion();
+  const cryptoSchema = new mongoose.Schema(
+    {
+      _id: {
+        type: String,
+        default: () => new mongoose.Types.ObjectId().toString(),
+      },
+      deletion_type: String,
+      last_deletion_date: String,
+    },
+    { versionKey: false, collection: "unwanted-docs-deletion-history" }
+  );
+
+  const deletionHistory = deletionConn.model("unwanted-docs-deletion-history", cryptoSchema);
+
+  // Endpoint to record docs deletion details
+  appCrypto.post("/api/recordRecentDocsDeletionDetails", async (req, res) => {
+    const { _id, deletion_type, last_deletion_date } = req.body;
+    console.log("Request Body:", req.body);
+    try {
+      const result = await deletionHistory.findOneAndUpdate(
+        { _id },
+        { deletion_type },
+        { $set: { last_deletion_date } },
+        { new: true, upsert: true }
+      );
+      res.status(200).send(`Document with ID ${_id} updated successfully`);
+    } catch (error) {
+      res.status(500).send("Error saving docs deletion details");
+    }
+  });
+
+  console.log(
+    `Connection to deletion database is running on port ${PORT3}`.brightGreen
+  );
+});
+
+/*  Endpoint to read data from DB for plotting line chart  */
+appCrypto.get("/api/get2025Data", async (req, res) => {
+  try {
+    const data = await Feb2025.find();
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching data from 2025 database" });
+  }
 });

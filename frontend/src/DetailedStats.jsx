@@ -2,7 +2,7 @@ import React from 'react'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import DeleteDocsIntervalInput from "./DeleteDocsIntervalInput";
 
-const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscoredIdDeletionResult, redundantDeletionResult, onIntervalChange, nonUnderscoredIdDocsCount, redundantDocsCount, notifyDeletingNonUnderscoredIdDocs, notifyDeletingRedundantDocs }) => {   
+const DetailedStats = ({ coin, httpError, error, data, dataSavedToDBStatus, deleteDocsError, nonUnderscoredIdDeletionResult, redundantDeletionResult, onIntervalChange, nonUnderscoredIdDocsCount, redundantDocsCount, notifyDeletingNonUnderscoredIdDocs, notifyDeletingRedundantDocs }) => {   
   const fetchDataStyle = {
     color: error ? "red" : "green",
     fontWeight: "bold",
@@ -61,27 +61,29 @@ const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscored
       <div style={outerContainerStyle}>
         <div style={containerStyle}>
           <div style={rowStyle}>
-            <h4 style={{ margin: "0" }}>Data saved to DB status: </h4>
+            <h4 style={{ margin: "0" }}>Data saved to DB status:&nbsp;</h4>
             <h4 style={{ ...fetchDataStyle, margin: "0", marginLeft: "8px" }}>
-              {msg}
+              {dataSavedToDBStatus}
             </h4>
           </div>
           <div style={rowStyle}>
             <h4 style={{ margin: "0" }}>
-              Non-underscored ID documents deleted:{" "}
+              Non-underscored ID documents deleted:&nbsp;
             </h4>
             <h4 style={{ ...deleteDocsStyle, margin: "0", marginLeft: "8px" }}>
               {nonUnderscoredIdDeletionResult}
             </h4>
           </div>
           <div style={rowStyle}>
-            <h4 style={{ margin: "0" }}>Redundant documents deleted: </h4>
+            <h4 style={{ margin: "0" }}>Redundant documents deleted:&nbsp;</h4>
             <h4 style={{ ...deleteDocsStyle, margin: "0", marginLeft: "8px" }}>
               {redundantDeletionResult}
             </h4>
           </div>
           <div style={rowStyle}>
-            <h4 style={{ margin: "0" }}>Non-underscored Id docs count: </h4>
+            <h4 style={{ margin: "0" }}>
+              Non-underscored Id docs count:&nbsp;
+            </h4>
             <h4
               style={{
                 ...nonUnderscoredIdDeletionStyle,
@@ -91,12 +93,19 @@ const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscored
             >
               {nonUnderscoredIdDocsCount}
             </h4>
-            <h4 style={{ margin: "0", marginLeft: "8px" }}>
+            <h4
+              style={{
+                margin: "0",
+                marginLeft: "8px",
+                fontStyle: "italic",
+                color: "#999999",
+              }}
+            >
               {notifyDeletingNonUnderscoredIdDocs}
             </h4>
           </div>
           <div style={rowStyle}>
-            <h4 style={{ margin: "0" }}>Redundant docs count: </h4>
+            <h4 style={{ margin: "0" }}>Redundant docs count:&nbsp;</h4>
             <h4
               style={{
                 ...redundantDeletionStyle,
@@ -106,7 +115,20 @@ const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscored
             >
               {redundantDocsCount}
             </h4>
+            <h4
+              style={{
+                margin: "0",
+                marginLeft: "8px",
+                fontStyle: "italic",
+                color: "#999999",
+              }}
+            >
+              {notifyDeletingRedundantDocs}
+            </h4>
           </div>
+        </div>
+        <div style={rowStyle}>
+          <h4 style={{ margin: "0" }}>Docs deletion details saved to DB status:&nbsp;</h4>
         </div>
         <DeleteDocsIntervalInput
           min={0}
@@ -145,13 +167,20 @@ const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscored
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((row) => (
+              {httpError && (
+                <TableRow>
+                  <TableCell colSpan={21} style={{ color: "red", fontWeight: "bold" }}>
+                    {httpError}
+                  </TableCell>
+                </TableRow>
+              )}
+              {data.map(row => (
                 <TableRow key={row.symbol}>
                   <TableCell scope="row">{row.symbol}</TableCell>
                   <TableCell
                     style={{
                       color:
-                        parseFloat(row.priceChangePercent) >= 0
+                        parseFloat(row.priceChange) >= 0
                           ? "green"
                           : "red",
                     }}
@@ -168,12 +197,8 @@ const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscored
                   >
                     {row.priceChangePercent}
                   </TableCell>
-                  <TableCell>
-                    {parseFloat(row.weightedAvgPrice).toFixed(2)}
-                  </TableCell>
-                  <TableCell>
-                    {parseFloat(row.prevClosePrice).toFixed(2)}
-                  </TableCell>
+                  <TableCell>{parseFloat(row.weightedAvgPrice).toFixed(2)}</TableCell>
+                  <TableCell>{parseFloat(row.prevClosePrice).toFixed(2)}</TableCell>
                   <TableCell>{parseFloat(row.lastPrice).toFixed(2)}</TableCell>
                   <TableCell>{parseFloat(row.lastQty).toFixed(2)}</TableCell>
                   <TableCell>{parseFloat(row.bidPrice).toFixed(2)}</TableCell>
@@ -184,16 +209,14 @@ const DetailedStats = ({ coin, error, data, msg, deleteDocsError, nonUnderscored
                   <TableCell>{parseFloat(row.highPrice).toFixed(2)}</TableCell>
                   <TableCell>{parseFloat(row.lowPrice).toFixed(2)}</TableCell>
                   <TableCell>{parseFloat(row.volume).toFixed(0)}</TableCell>
-                  <TableCell>
-                    {parseFloat(row.quoteVolume).toFixed(0)}
-                  </TableCell>
+                  <TableCell>{parseFloat(row.quoteVolume).toFixed(0)}</TableCell>
                   <TableCell>{row.openTime}</TableCell>
                   <TableCell>{row.closeTime}</TableCell>
                   <TableCell>{row.firstId}</TableCell>
                   <TableCell>{row.lastId}</TableCell>
                   <TableCell>{row.count}</TableCell>
                 </TableRow>
-              ))}
+                  ))}
             </TableBody>
           </Table>
         </TableContainer>

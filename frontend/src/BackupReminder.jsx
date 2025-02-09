@@ -24,8 +24,8 @@ const BackupReminder = () => {
       // alert(`${i} value of cancelClicked in parent component : ${cancelClicked}`)
       // cancelClicked ? setShouldBlink(false) : setShouldBlink([16, 10, 20, 30].includes(day));
       // alert(`${i} value of shouldBlink in parent component: ${shouldBlink}`)
-      console.log(`${i}`)
-      i++
+      // console.log(`${i}`)
+      // i++
     };
 
     // Initial check
